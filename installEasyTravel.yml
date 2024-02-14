@@ -1,0 +1,33 @@
+---
+- hosts: # Nodo objetivo
+  become: True
+  tasks:
+    - name: "Install Java"
+      apt:
+        name: default-jre
+        update_cache: True
+
+    - name: "Download Dynatrace EasyTravel Jar"
+      get_url:
+        url: https://etinstallers.demoability.dynatracelabs.com/latest/dynatrace-easytravel-linux-x86_64.jar
+        dest: /home/oscar/dynatrace-easytravel-linux-x86_64.jar
+
+    - name: "Check if EasyTravel Jar path exists"
+      stat:
+        path: /home/oscar/easytravel-2.0.0-x64
+      register: stat_result
+
+    - name: "Run EasyTravel Jar"
+      shell: java -jar /home/oscar/dynatrace-easytravel-linux-x86_64.jar -y
+      when: not stat_result['stat']['exists']
+
+    - name: "Check if EasyTravel is running"
+      shell: ps aux | grep com.dynatrace.easytravel.weblauncher.jar | grep -v grep
+      register: process_result
+      ignore_errors: True
+
+    - name: "Run weblauncher.sh"
+      shell: /home/oscar/easytravel-2.0.0-x64/weblauncher/weblauncher.sh &
+      when: process_result['stdout_lines'] | length < 1
+
+
