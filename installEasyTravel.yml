@@ -1,6 +1,8 @@
 ---
 - hosts: # Nodo objetivo
   become: True
+  vars: # Modificar el USER$ al usuario específico
+    user_home: /home/USER$/
   tasks:
     - name: "Install Java"
       apt:
@@ -9,25 +11,25 @@
 
     - name: "Download Dynatrace EasyTravel Jar"
       get_url:
-        url: https://etinstallers.demoability.dynatracelabs.com/latest/dynatrace-easytravel-linux-x86_64.jar
-        dest: /home/oscar/dynatrace-easytravel-linux-x86_64.jar
+        url: "https://etinstallers.demoability.dynatracelabs.com/latest/dynatrace-easytravel-linux-x86_64.jar"
+        dest: "{{ user_home }}dynatrace-easytravel-linux-x86_64.jar"
 
     - name: "Check if EasyTravel Jar path exists"
       stat:
-        path: /home/oscar/easytravel-2.0.0-x64
+        path: "{{ user_home }}easytravel-2.0.0-x64"
       register: stat_result
 
     - name: "Run EasyTravel Jar"
-      shell: java -jar /home/oscar/dynatrace-easytravel-linux-x86_64.jar -y
+      shell: "java -jar {{ user_home }}dynatrace-easytravel-linux-x86_64.jar -y"
       when: not stat_result['stat']['exists']
 
     - name: "Check if EasyTravel is running"
-      shell: ps aux | grep com.dynatrace.easytravel.weblauncher.jar | grep -v grep
+      shell: "ps aux | grep com.dynatrace.easytravel.weblauncher.jar | grep -v grep"
       register: process_result
       ignore_errors: True
 
     - name: "Run weblauncher.sh"
-      shell: /home/oscar/easytravel-2.0.0-x64/weblauncher/weblauncher.sh &
+      shell: "{{ user_home }}easytravel-2.0.0-x64/weblauncher/weblauncher.sh &"
       when: process_result['stdout_lines'] | length < 1
 
 
