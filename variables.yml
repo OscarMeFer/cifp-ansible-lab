@@ -2,4 +2,4 @@
 dynatrace_url:
 dynatrace_token:
 dynatrace_cert_url: "https://ca.dynatrace.com/dt-root.cert.pem"
-dynatrace_installer_path: "/tmp/Dynatrace-OneAgent-Linux-1.259.304.sh"
+dynatrace_installer_path: "/tmp/Dynatrace-OneAgent-Linux-1.283.139.20240209-194956.sh"
